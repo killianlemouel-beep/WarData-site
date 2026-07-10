@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WarData - Statistiques</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .stats-container { display: flex; flex-direction: column; gap: 30px; }
+        .chart-container { background: #1a1a1a; padding: 20px; border-radius: 8px; border: 1px solid #333; }
+        .chart-container canvas { max-height: 400px; }
+        .filters { display: flex; gap: 15px; flex-wrap: wrap; margin-bottom: 20px; }
+        .filter-group { display: flex; flex-direction: column; gap: 5px; }
+        .filter-group label { font-size: 14px; color: #ccc; }
+        .filter-group select { padding: 8px; border-radius: 4px; border: 1px solid #444; background: #222; color: white; }
+        .stats-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .total-casualties { background: #ff4444; padding: 15px 25px; border-radius: 8px; font-size: 18px; font-weight: bold; }
+        table { width: 100%; border-collapse: collapse; background: #1a1a1a; border-radius: 8px; overflow: hidden; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #333; }
+        th { background: #2a2a2a; color: #fff; }
+        tr:hover { background: #2a2a2a; }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>WarData</h1>
+        <p class="subtitle">Statistiques des conflits historiques</p>
+    </header>
+
+    <nav>
+        <ul>
+            <li><a href="index.html">Accueil</a></li>
+            <li><a href="map.html">Planisphère</a></li>
+            <li><a href="stats.html" class="active">Statistiques</a></li>
+        </ul>
+    </nav>
+
+    <main>
+        <div class="stats-header">
+            <h2>Analyse des conflits</h2>
+            <div class="total-casualties" id="total-casualties">Total : 0 morts estimés</div>
+        </div>
+
+        <div class="filters">
+            <div class="filter-group">
+                <label for="period-filter">Période :</label>
+                <select id="period-filter" onchange="updateCharts()">
+                    <option value="all">Toutes périodes</option>
+                    <option value="ancient">Antiquité (-500 à 500)</option>
+                    <option value="medieval">Moyen Âge (500 à 1500)</option>
+                    <option value="modern">Époque moderne (1500 à 1900)</option>
+                    <option value="contemporary">Époque contemporaine (1900 à aujourd'hui)</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label for="type-filter">Type :</label>
+                <select id="type-filter" onchange="updateCharts()">
+                    <option value="all">Tous types</option>
+                    <option value="world">Guerres mondiales</option>
+                    <option value="regional">Guerres régionales</option>
+                    <option value="civil">Guerres civiles</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="stats-container">
+            <div class="chart-container">
+                <h3>📈 Morts par guerre (Top 10)</h3>
+                <canvas id="deathsChart"></canvas>
+            </div>
+
+            <div class="chart-container">
+                <h3>📅 Évolution des conflits par siècle</h3>
+                <canvas id="timelineChart"></canvas>
+            </div>
+
+            <div class="chart-container">
+                <h3>🌍 Répartition par continent</h3>
+                <canvas id="continentChart"></canvas>
+            </div>
+
+            <div class="chart-container">
+                <h3>📋 Détails des guerres</h3>
+                <div style="overflow-x: auto;">
+                    <table id="warsTable">
+                        <thead>
+                            <tr>
+                                <th>Guerre</th>
+                                <th>Période</th>
+                                <th>Morts estimés</th>
+                                <th>Type</th>
+                                <th>Continent</th>
+                            </tr>
+                        </thead>
+                        <tbody id="warsTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <p>WarData - Statistiques | Données estimées | 2026</p>
+    </footer>
+
+    <script>
+        const warsData = [
+            { name: "Seconde Guerre Mondiale", start: 1939, end: 1945, deaths: 60000000, type: "world", continent: "Europe/Asie", period: "contemporary" },
+            { name: "Première Guerre Mondiale", start: 1914, end: 1918, deaths: 20000000, type: "world", continent: "Europe", period: "contemporary" },
+            { name: "Guerre de Trente Ans", start: 1618, end: 1648, deaths: 8000000, type: "regional", continent: "Europe", period: "modern" },
+            { name: "Guerre napoléonienne", start: 1803, end: 1815, deaths: 6000000, type: "regional", continent: "Europe", period: "modern" },
+            { name: "Guerre de Corée", start: 1950, end: 1953, deaths: 3000000, type: "regional", continent: "Asie", period: "contemporary" },
+            { name: "Guerre du Vietnam", start: 1955, end: 1975, deaths: 2000000, type: "regional", continent: "Asie", period: "contemporary" },
+            { name: "Guerre civile chinoise", start: 1927, end: 1949, deaths: 2500000, type: "civil", continent: "Asie", period: "contemporary" },
+            { name: "Guerre de Sécession", start: 1861, end: 1865, deaths: 620000, type: "civil", continent: "Amérique", period: "modern" },
+            { name: "Guerre de Cent Ans", start: 1337, end: 1453, deaths: 2500000, type: "regional", continent: "Europe", period: "medieval" },
+            { name: "Croisades", start: 1095, end: 1291, deaths: 1500000, type: "regional", continent: "Asie/Europe", period: "medieval" },
+            { name: "Conquête de l'Amérique", start: 1492, end: 1600, deaths: 1000000, type: "regional", continent: "Amérique", period: "modern" },
+            { name: "Guerre froide (conflits indirects)", start: 1947, end: 1991, deaths: 20000000, type: "world", continent: "Monde", period: "contemporary" },
+            { name: \"Guerre d'Irak\", start: 2003, end: 2011, deaths: 500000, type: \"regional\", continent: \"Asie\", period: \"contemporary\" },
+            { name: \"Guerre d'Afghanistan\", start: 2001, end: 2021, deaths: 240000, type: \"regional\", continent: \"Asie\", period: \"contemporary\" },
+            { name: \"Guerre de 1812\", start: 1812, end: 1815, deaths: 50000, type: \"regional\", continent: \"Amérique\", period: \"modern\" }
+        ];
+
+        const colors = { world: '#ff4444', regional: '#ffaa44', civil: '#44aa44' };
+        const continentColors = { Europe: '#4444ff', Asie: '#ff4444', Amérique: '#44ff44', Afrique: '#ff44ff', Océanie: '#44ffff', Monde: '#ffffff' };
+
+        let deathsChart, timelineChart, continentChart;
+
+        function initCharts() {
+            const deathsCtx = document.getElementById('deathsChart').getContext('2d');
+            deathsChart = new Chart(deathsCtx, {
+                type: 'bar',
+                data: { labels: [], datasets: [] },
+                options: {
+                    responsive: true,
+                    plugins: { legend: { display: false } },
+                    scales: { y: { beginAtZero: true, title: { display: true, text: 'Morts estimés' } }, x: { title: { display: true, text: 'Guerre' } } }
+                }
+            });
+
+            const timelineCtx = document.getElementById('timelineChart').getContext('2d');
+            timelineChart = new Chart(timelineCtx, {
+                type: 'line',
+                data: { labels: [], datasets: [] },
+                options: {
+                    responsive: true,
+                    plugins: { legend: { display: true } },
+                    scales: { y: { beginAtZero: true, title: { display: true, text: 'Nombre de guerres' } }, x: { title: { display: true, text: 'Siècle' } } }
+                }
+            });
+
+            const continentCtx = document.getElementById('continentChart').getContext('2d');
+            continentChart = new Chart(continentCtx, {
+                type: 'doughnut',
+                data: { labels: [], datasets: [] },
+                options: { responsive: true, plugins: { legend: { position: 'right' } } }
+            });
+
+            updateCharts();
+        }
+
+        function updateCharts() {
+            const periodFilter = document.getElementById('period-filter').value;
+            const typeFilter = document.getElementById('type-filter').value;
+
+            let filteredData = warsData.filter(war => {
+                const periodMatch = periodFilter === 'all' || war.period === periodFilter;
+                const typeMatch = typeFilter === 'all' || war.type === typeFilter;
+                return periodMatch && typeMatch;
+            });
+
+            const totalDeaths = filteredData.reduce((sum, war) => sum + war.deaths, 0);
+            document.getElementById('total-casualties').textContent = `Total : ${totalDeaths.toLocaleString()} morts estimés`;
+
+            filteredData.sort((a, b) => b.deaths - a.deaths);
+            const top10 = filteredData.slice(0, 10);
+            deathsChart.data.labels = top10.map(war => war.name);
+            deathsChart.data.datasets = [{ label: 'Morts estimés', data: top10.map(war => war.deaths), backgroundColor: top10.map(war => colors[war.type] || '#888888') }];
+            deathsChart.update();
+
+            const centuries = {};
+            filteredData.forEach(war => { const century = Math.ceil(war.start / 100); centuries[century] = (centuries[century] || 0) + 1; });
+            const sortedCenturies = Object.keys(centuries).sort();
+            timelineChart.data.labels = sortedCenturies.map(c => `${c}ème siècle`);
+            timelineChart.data.datasets = [{ label: 'Nombre de guerres', data: sortedCenturies.map(c => centuries[c]), borderColor: '#ff4444', backgroundColor: 'rgba(255, 68, 68, 0.1)', fill: true }];
+            timelineChart.update();
+
+            const continents = {};
+            filteredData.forEach(war => { continents[war.continent] = (continents[war.continent] || 0) + war.deaths; });
+            continentChart.data.labels = Object.keys(continents);
+            continentChart.data.datasets = [{ label: 'Morts par continent', data: Object.values(continents), backgroundColor: Object.keys(continents).map(c => continentColors[c] || '#888888') }];
+            continentChart.update();
+
+            updateTable(filteredData);
+        }
+
+        function updateTable(data) {
+            const tbody = document.getElementById('warsTableBody');
+            tbody.innerHTML = '';
+            data.forEach(war => {
+                const row = document.createElement('tr');
+                row.innerHTML = `<td>${war.name}</td><td>${war.start} - ${war.end}</td><td>${war.deaths.toLocaleString()}</td><td>${war.type === 'world' ? 'Mondiale' : war.type === 'regional' ? 'Régionale' : 'Civile'}</td><td>${war.continent}</td>`;
+                tbody.appendChild(row);
+            });
+        }
+
+        window.onload = initCharts;
+    </script>
+</body>
+</html>
