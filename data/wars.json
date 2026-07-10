@@ -1,0 +1,74 @@
+{
+  "wars": [
+    {
+      "id": 1,
+      "name": "Seconde Guerre Mondiale",
+      "start": 1939,
+      "end": 1945,
+      "deaths": 60000000,
+      "type": "world",
+      "continent": "Europe/Asie",
+      "period": "contemporary",
+      "description": "Conflit mondial impliquant la majorité des nations du monde.",
+      "key_events": ["Invasion de la Pologne (1939)", "Bataille de France (1940)", "Opération Barbarossa (1941)", "Attaque de Pearl Harbor (1941)", "Débarquement de Normandie (1944)", "Bataille de Berlin (1945)"],
+      "countries": ["Allemagne", "Japon", "Italie", "États-Unis", "Royaume-Uni", "URSS", "France"],
+      "coordinates": [52.5200, 13.4050]
+    },
+    {
+      "id": 2,
+      "name": "Première Guerre Mondiale",
+      "start": 1914,
+      "end": 1918,
+      "deaths": 20000000,
+      "type": "world",
+      "continent": "Europe",
+      "period": "contemporary",
+      "description": "Guerre mondiale centrée en Europe.",
+      "key_events": ["Assassinat de François-Ferdinand (1914)", "Bataille de la Marne (1914)", "Bataille de Verdun (1916)", "Bataille de la Somme (1916)", "Entrée en guerre des États-Unis (1917)"],
+      "countries": ["Allemagne", "Autriche-Hongrie", "France", "Royaume-Uni", "Russie", "États-Unis"],
+      "coordinates": [50.8503, 4.3517]
+    },
+    {
+      "id": 3,
+      "name": "Guerre de Trente Ans",
+      "start": 1618,
+      "end": 1648,
+      "deaths": 8000000,
+      "type": "regional",
+      "continent": "Europe",
+      "period": "modern",
+      "description": "Série de guerres en Europe centrale.",
+      "key_events": ["Défenestration de Prague (1618)", "Bataille de la Montagne Blanche (1620)", "Sac de Magdebourg (1631)", "Paix de Westphalie (1648)"],
+      "countries": ["Saint-Empire", "Espagne", "Suède", "France", "Danemark"],
+      "coordinates": [50.0755, 14.4378]
+    },
+    {
+      "id": 4,
+      "name": "Guerres Napoléoniennes",
+      "start": 1803,
+      "end": 1815,
+      "deaths": 6000000,
+      "type": "regional",
+      "continent": "Europe",
+      "period": "modern",
+      "description": "Série de conflits globaux résultant de l'ascension de Napoléon Bonaparte.",
+      "key_events": ["Bataille d'Austerlitz (1805)", "Bataille d'Iéna (1806)", "Blocus continental (1806)", "Campagne de Russie (1812)", "Bataille de Waterloo (1815)"],
+      "countries": ["France", "Royaume-Uni", "Prusse", "Autriche", "Russie", "Espagne"],
+      "coordinates": [48.8566, 2.3522]
+    },
+    {
+      "id": 5,
+      "name": "Guerre de Corée",
+      "start": 1950,
+      "end": 1953,
+      "deaths": 3000000,
+      "type": "regional",
+      "continent": "Asie",
+      "period": "contemporary",
+      "description": "Guerre entre la Corée du Nord et la Corée du Sud.",
+      "key_events": ["Invasion nord-coréenne (1950)", "Débarquement d'Incheon (1950)", "Bataille du réservoir de Chosin (1950)", "Armistic de 1953"],
+      "countries": ["Corée du Nord", "Corée du Sud", "Chine", "États-Unis", "URSS"],
+      "coordinates": [37.5665, 126.9780]
+    }
+  ]
+}
