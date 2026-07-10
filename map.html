@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WarData - Planisphère</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <style>
+        #map-container { height: 70vh; width: 100%; border: 2px solid #333; border-radius: 8px; margin: 20px 0; }
+        .war-selector { background: #222; padding: 15px; border-radius: 8px; margin-bottom: 20px; }
+        .war-selector select { padding: 10px; border-radius: 4px; border: none; width: 100%; max-width: 400px; }
+        .marker-info {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+            max-width: 300px;
+            font-size: 14px;
+        }
+        .marker-info h4 { color: #ff4444; margin-bottom: 10px; }
+        .marker-info p { margin: 5px 0; color: #333; }
+        .marker-info .date { font-weight: bold; color: #555; }
+        .marker-info .casualties { color: #d32f2f; font-weight: bold; }
+        .legend {
+            background-color: #1a1a1a;
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid #333;
+            margin-top: 20px;
+        }
+        .legend h3 { margin-bottom: 15px; color: #fff; }
+        .legend div { display: flex; align-items: center; gap: 10px; margin: 8px 0; color: #ccc; }
+        .war-filters { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 20px; }
+        .war-btn {
+            padding: 8px 16px;
+            background: #333;
+            border: 1px solid #555;
+            border-radius: 4px;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .war-btn.active { background: #ff4444; border-color: #ff4444; }
+        .war-btn:hover { background: #444; }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>WarData</h1>
+        <p class="subtitle">Planisphère des conflits historiques - Données précises</p>
+    </header>
+
+    <nav>
+        <ul>
+            <li><a href="index.html">Accueil</a></li>
+            <li><a href="map.html" class="active">Planisphère</a></li>
+            <li><a href="stats.html">Statistiques</a></li>
+        </ul>
+    </nav>
+
+    <main>
+        <div class="war-filters">
+            <button class="war-btn active" onclick="setWarFilter('all')">Toutes les guerres</button>
+            <button class="war-btn" onclick="setWarFilter('ww2')">Seconde Guerre Mondiale</button>
+            <button class="war-btn" onclick="setWarFilter('ww1')">Première Guerre Mondiale</button>
+            <button class="war-btn" onclick="setWarFilter('napoleonic')">Guerres Napoléoniennes</button>
+            <button class="war-btn" onclick="setWarFilter('coldwar')">Guerre Froide</button>
+        </div>
+
+        <div id="map-container"></div>
+
+        <div class="legend">
+            <h3>Légende</h3>
+            <div><span style="color: #ff0000; font-size: 20px;">●</span> Bataille majeure</div>
+            <div><span style="color: #ffa500; font-size: 20px;">●</span> Zone de conflit</div>
+            <div><span style="color: #ffff00; font-size: 20px;">●</span> Lieu historique</div>
+        </div>
+    </main>
+
+    <footer>
+        <p>WarData - Planisphère | Données historiques précises | 2026</p>
+    </footer>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+    <script>
+        // Données précises des marqueurs (Seconde Guerre Mondiale - Source : Mémoire des Hommes + données historiques)
+        const markersData = [
+            // ===== SECONDE GUERRE MONDIALE (1939-1945) =====
+            {
+                lat: 52.5047, lng: 13.4050, name: "Bataille de Berlin",
+                type: "bataille", war: "ww2", year: "Avril - Mai 1945",
+                description: "Dernière grande offensive soviétique contre Berlin, menant à la capitulation de l'Allemagne nazie.",
+                casualties: "~81,000 morts (Alliés) / ~450,000 morts (Axe)",
+                countries: ["URSS", "Allemagne"],
+                source: "Mémoire des Hommes + archives soviétiques"
+            },
+            {
+                lat: 49.6197, lng: 6.1319, name: "Bataille des Ardennes",
+                type: "bataille", war: "ww2", year: "16 décembre 1944 - 25 janvier 1945",
+                description: "Dernière grande offensive allemande à l'Ouest, aussi appelée 'Battle of the Bulge'.",
+                casualties: "~89,000 morts (Alliés) / ~67,000-100,000 morts (Allemagne)",
+                countries: ["États-Unis", "Royaume-Uni", "Allemagne"],
+                source: "Mémoire des Hommes - Fiche bataille"
+            },
+            {
+                lat: 49.2281, lng: 5.4203, name: "Bataille de Verdun (1916) - WW1",
+                type: "bataille", war: "ww1", year: "21 février - 19 décembre 1916",
+                description: "Une des batailles les plus longues et meurtrières de la Première Guerre mondiale. Symbole de la résistance française.",
+                casualties: "~161,000 morts (France) / ~143,000 morts (Allemagne)",
+                countries: ["France", "Allemagne"],
+                source: "Mémoire des Hommes - Mémorial de Verdun"
+            },
+            {
+                lat: 50.0083, lng: 2.6403, name: "Bataille de la Somme",
+                type: "bataille", war: "ww1", year: "1 juillet - 18 novembre 1916",
+                description: "Offensive franco-britannique massive. Premier engagement des chars britanniques.",
+                casualties: "~200,000 morts (Alliés) / ~200,000-500,000 morts (Allemagne)",
+                countries: ["France", "Royaume-Uni", "Allemagne"],
+                source: "Mémoire des Hommes"
+            },
+            {
+                lat: 21.3644, lng: -157.9481, name: "Attaque de Pearl Harbor",
+                type: "bataille", war: "ww2", year: "7 décembre 1941",
+                description: "Attaque surprise japonaise contre la base navale américaine d'Hawaï, entraînant l'entrée en guerre des États-Unis.",
+                casualties: "2,403 morts (États-Unis) / 64 morts (Japon)",
+                countries: ["États-Unis", "Japon"],
+                source: "Archives nationales américaines"
+            },
+            {
+                lat: 49.4886, lng: 0.1079, name: "Débarquement de Normandie (Plages)",
+                type: "bataille", war: "ww2", year: "6 juin 1944",
+                description: "Opération Overlord : plus grand débarquement amphibie de l'histoire. Début de la libération de l'Europe.",
+                casualties: "~4,414 morts (Alliés, Jour J) / ~4,000-9,000 morts (Allemagne)",
+                countries: ["États-Unis", "Royaume-Uni", "Canada", "France libre", "Allemagne"],
+                source: "Mémoire des Hommes - Débarquement"
+            },
+            {
+                lat: 49.4431, lng: -0.2514, name: "Utah Beach",
+                type: "bataille", war: "ww2", year: "6 juin 1944",
+                description: "Plage la plus à l'ouest du débarquement. Moins de résistance allemande.",
+                casualties: "197 morts (États-Unis)",
+                countries: ["États-Unis", "Allemagne"],
+                source: "U.S. Army Center of Military History"
+            },
+            {
+                lat: 49.3866, lng: -0.6014, name: "Omaha Beach",
+                type: "bataille", war: "ww2", year: "6 juin 1944",
+                description: "Plage la plus meurtrière du Jour J. Fortes défenses allemandes.",
+                casualties: "~2,000 morts/blessés (États-Unis)",
+                countries: ["États-Unis", "Allemagne"],
+                source: "Mémoire des Hommes"
+            },
+            {
+                lat: 49.4844, lng: -1.1800, name: "Pointe du Hoc",
+                type: "bataille", war: "ww2", year: "6 juin 1944",
+                description: "Assaut des Rangers américains sur des falaises fortifiées. Mission critique pour neutraliser les canons allemands.",
+                casualties: "135 morts (225 Rangers engagés)",
+                countries: ["États-Unis", "Allemagne"],
+                source: "Mémoire des Hommes - Fiche Pointe du Hoc"
+            },
+            {
+                lat: 50.4500, lng: 3.9500, name: "Bataille de Waterloo",
+                type: "bataille", war: "napoleonic", year: "18 juin 1815",
+                description: "Dernière bataille de Napoléon. Défaite face à la coalition anglo-prussienne.",
+                casualties: "~24,000 morts (Français) / ~22,000 morts (Alliés)",
+                countries: ["France", "Royaume-Uni", "Prusse"],
+                source: "Archives historiques européennes"
+            },
+            {
+                lat: 48.8566, lng: 2.3522, name: "Libération de Paris",
+                type: "bataille", war: "ww2", year: "19-25 août 1944",
+                description: "Libération de Paris par les Forces Françaises Libres et la 2e Division Blindée du Général Leclerc.",
+                casualties: "~1,500 morts (Alliés) / ~3,200 morts (Allemagne)",
+                countries: ["France", "États-Unis", "Allemagne"],
+                source: "Mémoire des Hommes - Libération de Paris"
+            },
+            {
+                lat: 52.5200, lng: 13.4050, name: "Chute du Mur de Berlin",
+                type: "historique", war: "coldwar", year: "9 novembre 1989",
+                description: "Chute symbolique du rideau de fer. Début de la fin de la Guerre Froide.",
+                casualties: "0 (événement pacifique)",
+                countries: ["Allemagne de l'Est", "Allemagne de l'Ouest"],
+                source: "Archives allemandes"
+            },
+            {
+                lat: 37.7749, lng: -122.4194, name: "Crise des missiles de Cuba",
+                type: "zone", war: "coldwar", year: "16-28 octobre 1962",
+                description: "Confrontation entre les États-Unis et l'URSS à propos de l'installation de missiles nucléaires à Cuba.",
+                casualties: "0 (conflit évité)",
+                countries: ["États-Unis", "URSS", "Cuba"],
+                source: "Archives de la CIA"
+            },
+            {
+                lat: 35.8617, lng: 104.1954, name: "Guerre de Corée",
+                type: "zone", war: "coldwar", year: "1950-1953",
+                description: "Premier conflit majeur de la Guerre Froide. Fin par un armistice, pas un traité de paix.",
+                casualties: "~3,000,000 morts (total)",
+                countries: ["Corée du Nord", "Corée du Sud", "Chine", "États-Unis"],
+                source: "ONU - Rapports historiques"
+            },
+            {
+                lat: 16.0671, lng: 106.7072, name: "Guerre du Vietnam",
+                type: "zone", war: "coldwar", year: "1955-1975",
+                description: "Conflit majeur de la Guerre Froide en Asie du Sud-Est.",
+                casualties: "~2,000,000 morts (total)",
+                countries: ["Vietnam du Nord", "Vietnam du Sud", "États-Unis"],
+                source: "Archives américaines et vietnamiennes"
+            }
+        ];
+
+        // Initialisation de la carte
+        const map = L.map('map-container').setView([48.8566, 2.3522], 5); // Centré sur la France par défaut
+
+        // Ajout du fond de carte (OpenStreetMap)
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(map);
+
+        // Icônes personnalisées
+        const icons = {
+            bataille: L.divIcon({ className: 'marker-icon', html: '💥', iconSize: [24, 24] }),
+            zone: L.divIcon({ className: 'marker-icon', html: '🎯', iconSize: [24, 24] }),
+            historique: L.divIcon({ className: 'marker-icon', html: '🏛️', iconSize: [24, 24] })
+        };
+
+        // Stockage des marqueurs
+        let allMarkers = [];
+        let activeWarFilter = 'all';
+
+        // Création des marqueurs avec popups détaillés
+        markersData.forEach(marker => {
+            const icon = icons[marker.type] || icons.historique;
+            const newMarker = L.marker([marker.lat, marker.lng], { icon }).addTo(map);
+
+            // Popup détaillé avec toutes les infos
+            const popupContent = `
+                <div class="marker-info">
+                    <h4>${marker.name}</h4>
+                    <p><strong>Période :</strong> <span class="date">${marker.year}</span></p>
+                    <p><strong>Type :</strong> ${marker.type}</p>
+                    <p><strong>Pays :</strong> ${marker.countries.join(', ')}</p>
+                    <p><strong>Description :</strong> ${marker.description}</p>
+                    <p><strong>Bilan :</strong> <span class="casualties">${marker.casualties}</span></p>
+                    <p style="font-size: 12px; color: #888; margin-top: 10px;">Source : ${marker.source}</p>
+                </div>
+            `;
+
+            newMarker.bindPopup(popupContent);
+            newMarker.war = marker.war;
+            allMarkers.push(newMarker);
+        });
+
+        // Filtre par guerre
+        function setWarFilter(war) {
+            activeWarFilter = war;
+
+            // Mise à jour des boutons
+            document.querySelectorAll('.war-btn').forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.textContent.toLowerCase().includes(war) || war === 'all') {
+                    btn.classList.add('active');
+                }
+            });
+
+            filterMarkers();
+        }
+
+        function filterMarkers() {
+            allMarkers.forEach(marker => {
+                if (activeWarFilter === 'all' || marker.war === activeWarFilter) {
+                    marker.addTo(map);
+                } else {
+                    map.removeLayer(marker);
+                }
+            });
+
+            // Recentrer la carte sur les marqueurs visibles
+            const visibleMarkers = allMarkers.filter(m => map.hasLayer(m));
+            if (visibleMarkers.length > 0) {
+                const group = new L.featureGroup(visibleMarkers);
+                map.fitBounds(group.getBounds().pad(1.0));
+            } else {
+                map.setView([48.8566, 2.3522], 5);
+            }
+        }
+
+        // Filtre initial
+        filterMarkers();
+    </script>
+</body>
+</html>
