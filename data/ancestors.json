@@ -1,0 +1,56 @@
+{
+  "ancestors": [
+    {
+      "id": 1,
+      "lastName": "Dupont",
+      "firstName": "Jean",
+      "birthDate": "1895-03-15",
+      "deathDate": "1916-06-23",
+      "deathPlace": "Verdun, Meuse, France",
+      "deathCountry": "France",
+      "war": "Première Guerre Mondiale",
+      "rank": "Soldat",
+      "regiment": "152ème Régiment d'Infanterie",
+      "coordinates": [49.2281, 5.4203],
+      "memorial": "Ossuaire de Douaumont",
+      "source": "Mémoire des Hommes - Fiche matricule n°12345",
+      "notes": "Mort au combat lors de la bataille de Verdun. Mention 'Mort pour la France'."
+    },
+    {
+      "id": 2,
+      "lastName": "Martin",
+      "firstName": "Pierre",
+      "birthDate": "1920-08-10",
+      "deathDate": "1944-06-08",
+      "deathPlace": "Omaha Beach, Normandie, France",
+      "deathCountry": "France",
+      "war": "Seconde Guerre Mondiale",
+      "rank": "Sergent",
+      "regiment": "2ème Division Blindée",
+      "coordinates": [49.3866, -0.6014],
+      "memorial": "Cimetière américain de Colleville-sur-Mer",
+      "source": "Mémoire des Hommes - Fiche matricule n°67890",
+      "notes": "Tué lors du Débarquement de Normandie. Débarquement sur Omaha Beach."
+    },
+    {
+      "id": 3,
+      "lastName": "Bernard",
+      "firstName": "Henri",
+      "birthDate": "1910-11-20",
+      "deathDate": "1940-05-15",
+      "deathPlace": "Sedan, Ardennes, France",
+      "deathCountry": "France",
+      "war": "Seconde Guerre Mondiale",
+      "rank": "Caporal",
+      "regiment": "41ème Régiment d'Infanterie",
+      "coordinates": [49.7056, 4.9458],
+      "memorial": "Nécropole nationale de Sedan",
+      "source": "Mémoire des Hommes - Fiche matricule n°54321",
+      "notes": "Disparu lors de la bataille de France. Corps jamais retrouvé."
+    }
+  ],
+  "sources": {
+    "MemoireDesHommes": "https://www.memoiredeshommes.defense.gouv.fr",
+    "description": "Base de données officielle du Ministère des Armées. Contient +2,5 millions de fiches de soldats morts pour la France."
+  }
+}
