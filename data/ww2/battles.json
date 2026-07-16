@@ -1,0 +1,197 @@
+{
+  "war": "Seconde Guerre Mondiale",
+  "start": 1939,
+  "end": 1945,
+  "totalDeaths": 60000000,
+  "description": "Conflit mondial impliquant plus de 100 millions de personnes de 30 pays. Premier et seul conflit avec utilisation d'armes nucléaires.",
+  "battles": [
+    {
+      "id": 1,
+      "name": "Débarquement de Normandie (Opération Overlord)",
+      "start": "1944-06-06",
+      "end": "1944-08-30",
+      "coordinates": [49.4844, -0.1079],
+      "location": "Normandie, France",
+      "description": "Plus grand débarquement amphibie de l'histoire. Début de la libération de l'Europe occidentale.",
+      "beaches": [
+        {
+          "name": "Utah Beach",
+          "coordinates": [49.443086, -1.251389],
+          "countries": ["États-Unis"],
+          "casualties": { "deaths": 197, "wounded": 600, "missing": 0 },
+          "units": ["7e Armée US", "4e Division d'infanterie"]
+        },
+        {
+          "name": "Omaha Beach",
+          "coordinates": [49.386567, -0.601444],
+          "countries": ["États-Unis"],
+          "casualties": { "deaths": 2000, "wounded": 3000, "missing": 0 },
+          "units": ["1e Division", "29e Division"]
+        },
+        {
+          "name": "Gold Beach",
+          "coordinates": [49.438611, -0.377222],
+          "countries": ["Royaume-Uni"],
+          "casualties": { "deaths": 413, "wounded": 1000, "missing": 0 },
+          "units": ["50e Division (Northumbrian)"]
+        },
+        {
+          "name": "Juno Beach",
+          "coordinates": [49.393889, -0.358611],
+          "countries": ["Canada"],
+          "casualties": { "deaths": 340, "wounded": 574, "missing": 0 },
+          "units": ["3e Division canadienne"]
+        },
+        {
+          "name": "Sword Beach",
+          "coordinates": [49.484444, -0.107778],
+          "countries": ["Royaume-Uni", "France"],
+          "casualties": { "deaths": 288, "wounded": 600, "missing": 0 },
+          "units": ["3e Division britannique", "177e Brigade française"]
+        }
+      ],
+      "casualties": {
+        "États-Unis": { "deaths": 20838, "wounded": 135667, "missing": 10101 },
+        "Royaume-Uni": { "deaths": 11575, "wounded": 53815, "missing": 4101 },
+        "Canada": { "deaths": 5021, "wounded": 13104, "missing": 1744 },
+        "France (FFL)": { "deaths": 2025, "wounded": 8422, "missing": 1128 },
+        "Pologne": { "deaths": 576, "wounded": 2478, "missing": 112 },
+        "Allemagne": { "deaths": 200000, "wounded": 400000, "missing": 20000 }
+      },
+      "countries": ["États-Unis", "Royaume-Uni", "Canada", "France", "Pologne", "Allemagne"],
+      "keyEvents": [
+        "6 juin 1944 : Jour J",
+        "Opération Neptune (débarquement)",
+        "Opération Overlord (bataille de Normandie)",
+        "25 août 1944 : Libération de Paris"
+      ],
+      "sources": ["Mémoire des Hommes", "U.S. National WWII Museum"]
+    },
+    {
+      "id": 2,
+      "name": "Bataille de Berlin",
+      "start": "1945-04-16",
+      "end": "1945-05-02",
+      "coordinates": [52.5047, 13.4050],
+      "location": "Berlin, Allemagne",
+      "description": "Dernière grande offensive soviétique. Chute du Troisième Reich.",
+      "casualties": {
+        "URSS": { "deaths": 81000, "wounded": 280000, "missing": 0 },
+        "Pologne": { "deaths": 2800, "wounded": 10000, "missing": 0 },
+        "Allemagne": { "deaths": 450000, "wounded": 400000, "missing": 50000 }
+      },
+      "countries": ["URSS", "Pologne", "Allemagne"],
+      "keyEvents": [
+        "Encerclement de Berlin",
+        "Bataille du Reichstag",
+        "Suicide d'Hitler (30 avril 1945)",
+        "Capitulation allemande (8 mai 1945)"
+      ],
+      "sources": ["Mémoire des Hommes", "Archives soviétiques"]
+    },
+    {
+      "id": 3,
+      "name": "Bataille des Ardennes",
+      "start": "1944-12-16",
+      "end": "1945-01-25",
+      "coordinates": [49.6197, 6.1319],
+      "location": "Ardennes, Belgique/France",
+      "description": "Dernière grande offensive allemande à l'Ouest. Échec cuisant pour l'Allemagne.",
+      "casualties": {
+        "États-Unis": { "deaths": 89000, "wounded": 210000, "missing": 23000 },
+        "Royaume-Uni": { "deaths": 1400, "wounded": 4000, "missing": 200 },
+        "Allemagne": { "deaths": 67000, "wounded": 150000, "missing": 30000 }
+      },
+      "countries": ["États-Unis", "Royaume-Uni", "Allemagne"],
+      "keyEvents": [
+        "Attaque surprise allemande",
+        "Bataille de Bastogne",
+        "Contre-offensive alliée"
+      ],
+      "sources": ["Mémoire des Hommes", "U.S. Army Center of Military History"]
+    },
+    {
+      "id": 4,
+      "name": "Bataille de Stalingrad",
+      "start": "1942-08-23",
+      "end": "1943-02-02",
+      "coordinates": [48.7214, 44.5156],
+      "location": "Stalingrad (Volgograd), URSS",
+      "description": "Bataille décisive sur le front de l'Est. Tourne le cours de la guerre en faveur de l'URSS.",
+      "casualties": {
+        "URSS": { "deaths": 478741, "wounded": 650878, "missing": 115000 },
+        "Allemagne": { "deaths": 848000, "wounded": 1130000, "missing": 91000 },
+        "Roumanie": { "deaths": 5000, "wounded": 10000, "missing": 2000 },
+        "Italie": { "deaths": 2000, "wounded": 5000, "missing": 1000 }
+      },
+      "countries": ["URSS", "Allemagne", "Roumanie", "Italie"],
+      "keyEvents": [
+        "Opération Uranus (encerclement)",
+        "Combats urbains intenses",
+        "Capitulation de la 6e Armée allemande"
+      ],
+      "sources": ["Mémoire des Hommes", "Archives soviétiques"]
+    },
+    {
+      "id": 5,
+      "name": "Attaque de Pearl Harbor",
+      "start": "1941-12-07",
+      "end": "1941-12-07",
+      "coordinates": [21.3644, -157.9481],
+      "location": "Pearl Harbor, Hawaï, États-Unis",
+      "description": "Attaque surprise japonaise contre la base navale américaine. Entrée en guerre des États-Unis.",
+      "casualties": {
+        "États-Unis": { "deaths": 2403, "wounded": 1178, "missing": 0 },
+        "Japon": { "deaths": 64, "wounded": 0, "missing": 29 }
+      },
+      "countries": ["États-Unis", "Japon"],
+      "keyEvents": [
+        "Attaque à 7h48 (heure locale)",
+        "Destruction de la flotte du Pacifique",
+        "Déclaration de guerre des États-Unis"
+      ],
+      "sources": ["U.S. Navy", "Mémoire des Hommes"]
+    },
+    {
+      "id": 6,
+      "name": "Bataille de Midway",
+      "start": "1942-06-04",
+      "end": "1942-06-07",
+      "coordinates": [25.7953, -171.3889],
+      "location": "Atoll Midway, Pacifique",
+      "description": "Bataille navale décisive dans le Pacifique. Tourne le cours de la guerre navale.",
+      "casualties": {
+        "États-Unis": { "deaths": 307, "wounded": 0, "missing": 0 },
+        "Japon": { "deaths": 3057, "wounded": 0, "missing": 0 }
+      },
+      "countries": ["États-Unis", "Japon"],
+      "keyEvents": [
+        "Attaque japonaise sur Midway",
+        "Contre-attaque américaine",
+        "Perte de 4 porte-avions japonais"
+      ],
+      "sources": ["U.S. Navy", "Mémoire des Hommes"]
+    },
+    {
+      "id": 7,
+      "name": "Libération de Paris",
+      "start": "1944-08-19",
+      "end": "1944-08-25",
+      "coordinates": [48.8566, 2.3522],
+      "location": "Paris, France",
+      "description": "Libération de Paris par les Forces Françaises Libres et la 2e Division Blindée du Général Leclerc.",
+      "casualties": {
+        "France": { "deaths": 1300, "wounded": 4500, "missing": 0 },
+        "États-Unis": { "deaths": 200, "wounded": 800, "missing": 0 },
+        "Allemagne": { "deaths": 3200, "wounded": 12000, "missing": 0 }
+      },
+      "countries": ["France", "États-Unis", "Allemagne"],
+      "keyEvents": [
+        "Insurrection parisienne (19 août)",
+        "Entrée des Alliés (25 août)",
+        "Défilé de la victoire (26 août)"
+      ],
+      "sources": ["Mémoire des Hommes", "Archives de Paris"]
+    }
+  ]
+}
