@@ -8,8 +8,35 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <style>
         #map-container { height: 70vh; width: 100%; border: 2px solid #333; border-radius: 8px; margin: 20px 0; }
-        .battle-selector { background: #222; padding: 15px; border-radius: 8px; margin-bottom: 20px; }
-        .battle-selector select { padding: 10px; border-radius: 4px; border: none; width: 100%; max-width: 500px; }
+        .controls {
+            background: #1a1a1a;
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid #333;
+            margin-bottom: 20px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        @media (max-width: 768px) {
+            .controls { grid-template-columns: 1fr; }
+        }
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .control-group label {
+            color: #ccc;
+            font-weight: bold;
+        }
+        .control-group select, .control-group input {
+            padding: 10px;
+            border-radius: 4px;
+            border: 1px solid #444;
+            background: #222;
+            color: white;
+        }
         .marker-info {
             background: white;
             padding: 15px;
@@ -22,15 +49,6 @@
         .marker-info p { margin: 5px 0; color: #333; }
         .marker-info .date { font-weight: bold; color: #555; }
         .marker-info .casualties { color: #d32f2f; font-weight: bold; }
-        .legend {
-            background-color: #1a1a1a;
-            padding: 20px;
-            border-radius: 8px;
-            border: 1px solid #333;
-            margin-top: 20px;
-        }
-        .legend h3 { margin-bottom: 15px; color: #fff; }
-        .legend div { display: flex; align-items: center; gap: 10px; margin: 8px 0; color: #ccc; }
         .battle-list {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
@@ -58,6 +76,20 @@
             margin: 5px 0;
             font-size: 14px;
         }
+        .theatre-badge {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+            margin-left: 10px;
+        }
+        .theatre-europe_ouest { background: #ff4444; color: white; }
+        .theatre-europe_est { background: #4488ff; color: white; }
+        .theatre-pacifique { background: #44ff44; color: black; }
+        .theatre-afrique { background: #ffaa44; color: black; }
+        .theatre-mediterranee { background: #aa44ff; color: white; }
+        .theatre-autres { background: #888888; color: white; }
         .casualties-table {
             width: 100%;
             border-collapse: collapse;
@@ -77,9 +109,40 @@
         .casualties-table tr:hover {
             background: #2a2a2a;
         }
-        .beach-marker {
-            color: #4488ff;
-            font-size: 20px;
+        .legend {
+            background-color: #1a1a1a;
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid #333;
+            margin-top: 20px;
+        }
+        .legend h3 { margin-bottom: 15px; color: #fff; }
+        .legend div { display: flex; align-items: center; gap: 10px; margin: 8px 0; color: #ccc; }
+        .stats-summary {
+            background: #1a1a1a;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #333;
+            margin-bottom: 20px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+        .stat-card {
+            text-align: center;
+            padding: 10px;
+            background: #222;
+            border-radius: 4px;
+        }
+        .stat-card h4 {
+            color: #ff4444;
+            font-size: 1.2rem;
+            margin-bottom: 5px;
+        }
+        .stat-card p {
+            color: #ccc;
+            font-size: 1.5rem;
+            font-weight: bold;
         }
     </style>
 </head>
@@ -100,199 +163,197 @@
     </nav>
 
     <main>
-        <div class="battle-selector">
-            <label for="battle-select">Sélectionnez une bataille :</label>
-            <select id="battle-select" onchange="showBattle()">
-                <option value="">-- Toutes les batailles --</option>
-                <option value="normandy">Débarquement de Normandie (6 juin 1944)</option>
-                <option value="berlin">Bataille de Berlin (avril-mai 1945)</option>
-                <option value="ardennes">Bataille des Ardennes (décembre 1944 - janvier 1945)</option>
-                <option value="stalingrad">Bataille de Stalingrad (août 1942 - février 1943)</option>
-                <option value="pearlharbor">Attaque de Pearl Harbor (7 décembre 1941)</option>
-                <option value="midway">Bataille de Midway (4-7 juin 1942)</option>
-                <option value="paris">Libération de Paris (août 1944)</option>
-            </select>
+        <!-- Statistiques globales -->
+        <div class="stats-summary">
+            <div class="stat-card">
+                <h4>Total des morts</h4>
+                <p>60 000 000</p>
+            </div>
+            <div class="stat-card">
+                <h4>Batailles répertoriées</h4>
+                <p id="total-battles">0</p>
+            </div>
+            <div class="stat-card">
+                <h4>Pays impliqués</h4>
+                <p>61</p>
+            </div>
+            <div class="stat-card">
+                <h4>Théâtres d'opérations</h4>
+                <p>5</p>
+            </div>
         </div>
 
+        <!-- Filtres -->
+        <div class="controls">
+            <div class="control-group">
+                <label for="theatre-filter">Filtrer par théâtre :</label>
+                <select id="theatre-filter" onchange="filterBattles()">
+                    <option value="all">Tous les théâtres</option>
+                    <option value="europe_ouest">Front de l'Ouest (Europe)</option>
+                    <option value="europe_est">Front de l'Est (URSS)</option>
+                    <option value="pacifique">Théâtre Pacifique</option>
+                    <option value="afrique">Campagne d'Afrique</option>
+                    <option value="mediterranee">Théâtre Méditerranée</option>
+                    <option value="autres">Autres théâtres</option>
+                </select>
+            </div>
+            <div class="control-group">
+                <label for="year-filter">Filtrer par année :</label>
+                <select id="year-filter" onchange="filterBattles()">
+                    <option value="all">Toutes les années</option>
+                    <option value="1939">1939</option>
+                    <option value="1940">1940</option>
+                    <option value="1941">1941</option>
+                    <option value="1942">1942</option>
+                    <option value="1943">1943</option>
+                    <option value="1944">1944</option>
+                    <option value="1945">1945</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Liste des batailles -->
         <div id="battle-list" class="battle-list">
             <!-- Les cartes des batailles seront affichées ici -->
         </div>
 
+        <!-- Carte -->
         <div id="map-container"></div>
 
+        <!-- Légende -->
         <div class="legend">
             <h3>Légende</h3>
-            <div><span style="color: #ff0000; font-size: 20px;">●</span> Bataille majeure</div>
-            <div><span style="color: #4488ff; font-size: 20px;">●</span> Plage du Débarquement</div>
-            <div><span style="color: #ffa500; font-size: 20px;">●</span> Zone de conflit</div>
+            <div><span style="color: #ff0000; font-size: 20px;">●</span> Bataille majeure (Front de l'Ouest)</div>
+            <div><span style="color: #4488ff; font-size: 20px;">●</span> Bataille majeure (Front de l'Est)</div>
+            <div><span style="color: #44ff44; font-size: 20px;">●</span> Bataille majeure (Pacifique)</div>
+            <div><span style="color: #ffaa44; font-size: 20px;">●</span> Bataille majeure (Afrique)</div>
+            <div><span style="color: #aa44ff; font-size: 20px;">●</span> Bataille majeure (Méditerranée)</div>
+            <div><span style="color: #888888; font-size: 20px;">●</span> Bataille majeure (Autres)</div>
+            <div><span style="color: #44ffff; font-size: 20px;">🏖️</span> Plage du Débarquement</div>
         </div>
     </main>
 
     <footer>
-        <p>WarData - Seconde Guerre Mondiale | Données : Mémoire des Hommes, U.S. National WWII Museum | 2026</p>
+        <p>WarData - Seconde Guerre Mondiale | Données : Mémoire des Hommes, U.S. National WWII Museum, Archives soviétiques | 2026</p>
     </footer>
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <script>
-        // Données des batailles de la WW2
-        const ww2Battles = {
-            normandy: {
-                name: "Débarquement de Normandie",
-                start: "1944-06-06",
-                end: "1944-08-30",
-                description: "Plus grand débarquement amphibie de l'histoire. Début de la libération de l'Europe occidentale.",
-                coordinates: [49.4844, -0.1079],
-                beaches: [
-                    { name: "Utah Beach", coords: [49.443086, -1.251389], casualties: { "États-Unis": 197 } },
-                    { name: "Omaha Beach", coords: [49.386567, -0.601444], casualties: { "États-Unis": 2000 } },
-                    { name: "Gold Beach", coords: [49.438611, -0.377222], casualties: { "Royaume-Uni": 413 } },
-                    { name: "Juno Beach", coords: [49.393889, -0.358611], casualties: { "Canada": 340 } },
-                    { name: "Sword Beach", coords: [49.484444, -0.107778], casualties: { "Royaume-Uni": 288, "France": 0 } }
-                ],
-                casualties: {
-                    "États-Unis": { deaths: 20838, wounded: 135667, missing: 10101 },
-                    "Royaume-Uni": { deaths: 11575, wounded: 53815, missing: 4101 },
-                    "Canada": { deaths: 5021, wounded: 13104, missing: 1744 },
-                    "France (FFL)": { deaths: 2025, wounded: 8422, missing: 1128 },
-                    "Pologne": { deaths: 576, wounded: 2478, missing: 112 },
-                    "Allemagne": { deaths: 200000, wounded: 400000, missing: 20000 }
-                }
-            },
-            berlin: {
-                name: "Bataille de Berlin",
-                start: "1945-04-16",
-                end: "1945-05-02",
-                description: "Dernière grande offensive soviétique. Chute du Troisième Reich.",
-                coordinates: [52.5047, 13.4050],
-                casualties: {
-                    "URSS": { deaths: 81000, wounded: 280000, missing: 0 },
-                    "Pologne": { deaths: 2800, wounded: 10000, missing: 0 },
-                    "Allemagne": { deaths: 450000, wounded: 400000, missing: 50000 }
-                }
-            },
-            ardennes: {
-                name: "Bataille des Ardennes",
-                start: "1944-12-16",
-                end: "1945-01-25",
-                description: "Dernière grande offensive allemande à l'Ouest. Échec cuisant pour l'Allemagne.",
-                coordinates: [49.6197, 6.1319],
-                casualties: {
-                    "États-Unis": { deaths: 89000, wounded: 210000, missing: 23000 },
-                    "Royaume-Uni": { deaths: 1400, wounded: 4000, missing: 200 },
-                    "Allemagne": { deaths: 67000, wounded: 150000, missing: 30000 }
-                }
-            },
-            stalingrad: {
-                name: "Bataille de Stalingrad",
-                start: "1942-08-23",
-                end: "1943-02-02",
-                description: "Bataille décisive sur le front de l'Est. Tourne le cours de la guerre en faveur de l'URSS.",
-                coordinates: [48.7214, 44.5156],
-                casualties: {
-                    "URSS": { deaths: 478741, wounded: 650878, missing: 115000 },
-                    "Allemagne": { deaths: 848000, wounded: 1130000, missing: 91000 },
-                    "Roumanie": { deaths: 5000, wounded: 10000, missing: 2000 },
-                    "Italie": { deaths: 2000, wounded: 5000, missing: 1000 }
-                }
-            },
-            pearlharbor: {
-                name: "Attaque de Pearl Harbor",
-                start: "1941-12-07",
-                end: "1941-12-07",
-                description: "Attaque surprise japonaise contre la base navale américaine. Entrée en guerre des États-Unis.",
-                coordinates: [21.3644, -157.9481],
-                casualties: {
-                    "États-Unis": { deaths: 2403, wounded: 1178, missing: 0 },
-                    "Japon": { deaths: 64, wounded: 0, missing: 29 }
-                }
-            },
-            midway: {
-                name: "Bataille de Midway",
-                start: "1942-06-04",
-                end: "1942-06-07",
-                description: "Bataille navale décisive dans le Pacifique. Tourne le cours de la guerre navale.",
-                coordinates: [25.7953, -171.3889],
-                casualties: {
-                    "États-Unis": { deaths: 307, wounded: 0, missing: 0 },
-                    "Japon": { deaths: 3057, wounded: 0, missing: 0 }
-                }
-            },
-            paris: {
-                name: "Libération de Paris",
-                start: "1944-08-19",
-                end: "1944-08-25",
-                description: "Libération de Paris par les Forces Françaises Libres et la 2e Division Blindée du Général Leclerc.",
-                coordinates: [48.8566, 2.3522],
-                casualties: {
-                    "France": { deaths: 1300, wounded: 4500, missing: 0 },
-                    "États-Unis": { deaths: 200, wounded: 800, missing: 0 },
-                    "Allemagne": { deaths: 3200, wounded: 12000, missing: 0 }
-                }
-            }
-        };
+        // Charger les données des batailles
+        let ww2Battles = [];
+
+        // Charger le JSON
+        fetch('../data/ww2/battles.json')
+            .then(response => response.json())
+            .then(data => {
+                ww2Battles = data.battles;
+                document.getElementById('total-battles').textContent = ww2Battles.length;
+                showAllBattles();
+            })
+            .catch(error => {
+                console.error("Erreur de chargement des données:", error);
+                // Données de secours
+                ww2Battles = [
+                    {
+                        id: 1, name: "Débarquement de Normandie", theatre: "europe_ouest",
+                        start: "1944-06-06", end: "1944-08-30", coordinates: [49.4844, -0.1079],
+                        location: "Normandie, France", description: "Plus grand débarquement amphibie de l'histoire.",
+                        casualties: { "États-Unis": { deaths: 20838 }, "Allemagne": { deaths: 200000 } }
+                    }
+                ];
+                showAllBattles();
+            });
 
         // Initialisation de la carte
-        const map = L.map('map-container').setView([48.8566, 2.3522], 5);
+        const map = L.map('map-container').setView([20, 0], 2);
 
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         }).addTo(map);
 
-        // Icônes
+        // Icônes par théâtre
         const icons = {
-            battle: L.divIcon({ className: 'marker-icon', html: '💥', iconSize: [24, 24] }),
-            beach: L.divIcon({ className: 'marker-icon', html: '🏖️', iconSize: [24, 24] }),
-            zone: L.divIcon({ className: 'marker-icon', html: '🎯', iconSize: [24, 24] })
+            europe_ouest: L.divIcon({ className: 'marker-icon', html: '💥', iconSize: [24, 24], iconAnchor: [12, 12] }),
+            europe_est: L.divIcon({ className: 'marker-icon', html: '⚔️', iconSize: [24, 24], iconAnchor: [12, 12] }),
+            pacifique: L.divIcon({ className: 'marker-icon', html: '🌊', iconSize: [24, 24], iconAnchor: [12, 12] }),
+            afrique: L.divIcon({ className: 'marker-icon', html: '🏜️', iconSize: [24, 24], iconAnchor: [12, 12] }),
+            mediterranee: L.divIcon({ className: 'marker-icon', html: '🏛️', iconSize: [24, 24], iconAnchor: [12, 12] }),
+            autres: L.divIcon({ className: 'marker-icon', html: '⚓', iconSize: [24, 24], iconAnchor: [12, 12] }),
+            beach: L.divIcon({ className: 'marker-icon', html: '🏖️', iconSize: [24, 24], iconAnchor: [12, 12] })
         };
 
         let allMarkers = [];
-        let currentBattle = null;
+        let filteredBattles = [];
 
-        // Afficher toutes les batailles au chargement
-        function showAllBattles() {
-            Object.keys(ww2Battles).forEach(battleKey => {
-                const battle = ww2Battles[battleKey];
-                addBattleToList(battleKey, battle);
-                addBattleToMap(battleKey, battle);
+        // Filtrer les batailles
+        function filterBattles() {
+            const theatreFilter = document.getElementById('theatre-filter').value;
+            const yearFilter = document.getElementById('year-filter').value;
+
+            filteredBattles = ww2Battles.filter(battle => {
+                const theatreMatch = theatreFilter === 'all' || battle.theatre === theatreFilter;
+                const yearMatch = yearFilter === 'all' || getYear(battle.start) === parseInt(yearFilter);
+                return theatreMatch && yearMatch;
             });
+
+            displayBattles();
         }
 
-        // Afficher une bataille spécifique
-        function showBattle() {
-            const battleKey = document.getElementById('battle-select').value;
+        // Obtenir l'année à partir d'une date (format AAAA-MM-JJ)
+        function getYear(dateString) {
+            return parseInt(dateString.split('-')[0]);
+        }
+
+        // Afficher les batailles
+        function displayBattles() {
             clearMap();
             clearBattleList();
 
-            if (battleKey) {
-                const battle = ww2Battles[battleKey];
-                addBattleToList(battleKey, battle);
-                addBattleToMap(battleKey, battle);
-                currentBattle = battleKey;
-            } else {
-                showAllBattles();
+            if (filteredBattles.length === 0) {
+                document.getElementById('battle-list').innerHTML = '<p style="color: #888; text-align: center; grid-column: 1 / -1;">Aucune bataille trouvée.</p>';
+                return;
             }
+
+            filteredBattles.forEach(battle => {
+                addBattleToList(battle);
+                addBattleToMap(battle);
+            });
         }
 
         // Ajouter une bataille à la liste
-        function addBattleToList(battleKey, battle) {
+        function addBattleToList(battle) {
             const battleList = document.getElementById('battle-list');
             const battleCard = document.createElement('div');
             battleCard.className = 'battle-card';
+            battleCard.onclick = () => focusOnBattle(battle);
 
-            // Tableau des pertes par nationalité
+            // Badge du théâtre
+            const theatreClass = `theatre-${battle.theatre}`;
+            const theatreName = getTheatreName(battle.theatre);
+
+            // Tableau des pertes
             let casualtiesHtml = '<table class="casualties-table"><thead><tr><th>Pays</th><th>Morts</th><th>Blessés</th><th>Disparus</th></tr></thead><tbody>';
             for (const [country, stats] of Object.entries(battle.casualties)) {
-                casualtiesHtml += `<tr><td>${country}</td><td>${stats.deaths.toLocaleString()}</td><td>${stats.wounded.toLocaleString()}</td><td>${stats.missing.toLocaleString()}</td></tr>`;
+                casualtiesHtml += `<tr><td>${country}</td><td>${stats.deaths.toLocaleString()}</td><td>${stats.wounded ? stats.wounded.toLocaleString() : 'N/A'}</td><td>${stats.missing ? stats.missing.toLocaleString() : '0'}</td></tr>`;
             }
             casualtiesHtml += '</tbody></table>';
 
+            // Plages du Débarquement (si applicable)
+            let beachesHtml = '';
+            if (battle.beaches) {
+                beachesHtml = '<p><strong>Plages du Débarquement :</strong></p>';
+                battle.beaches.forEach(beach => {
+                    beachesHtml += `<p>• ${beach.name}: ${Object.values(beach.casualties)[0]} morts</p>`;
+                });
+            }
+
             battleCard.innerHTML = `
-                <h3>${battle.name}</h3>
+                <h3>${battle.name} <span class="theatre-badge ${theatreClass}">${theatreName}</span></h3>
                 <p><strong>Période :</strong> ${battle.start} - ${battle.end}</p>
                 <p><strong>Lieu :</strong> ${battle.location}</p>
                 <p><strong>Description :</strong> ${battle.description}</p>
+                ${beachesHtml}
                 <p><strong>Pertes par nationalité :</strong></p>
                 ${casualtiesHtml}
             `;
@@ -301,20 +362,27 @@
         }
 
         // Ajouter une bataille à la carte
-        function addBattleToMap(battleKey, battle) {
-            // Marqueur principal pour la bataille
-            const mainMarker = L.marker(battle.coordinates, { icon: icons.battle }).addTo(map);
+        function addBattleToMap(battle) {
+            // Icône selon le théâtre
+            const icon = icons[battle.theatre] || icons.autres;
 
+            // Marqueur principal
+            const mainMarker = L.marker(battle.coordinates, { icon }).addTo(map);
+            allMarkers.push(mainMarker);
+
+            // Popup
             let popupContent = `
                 <div class="marker-info">
                     <h4>${battle.name}</h4>
+                    <p><strong>Théâtre :</strong> ${getTheatreName(battle.theatre)}</p>
                     <p><strong>Période :</strong> ${battle.start} - ${battle.end}</p>
                     <p><strong>Lieu :</strong> ${battle.location}</p>
                     <p><strong>Description :</strong> ${battle.description}</p>
             `;
 
-            // Si c'est le Débarquement, ajouter les plages
-            if (battleKey === 'normandy' && battle.beaches) {
+            // Plages du Débarquement
+            if (battle.beaches) {
+                popupContent += `<p><strong>Plages du Débarquement :</strong></p>`;
                 battle.beaches.forEach(beach => {
                     const beachMarker = L.marker(beach.coords, { icon: icons.beach }).addTo(map);
                     allMarkers.push(beachMarker);
@@ -331,27 +399,27 @@
                             <p>${beachCasualties}</p>
                         </div>
                     `);
-                });
 
-                popupContent += `<p><strong>Plages du Débarquement :</strong></p>`;
-                battle.beaches.forEach(beach => {
                     popupContent += `<p>• ${beach.name}: ${Object.values(beach.casualties)[0]} morts</p>`;
                 });
             }
 
+            // Pertes totales
             popupContent += `<p><strong>Pertes totales :</strong></p>`;
             for (const [country, stats] of Object.entries(battle.casualties)) {
-                popupContent += `<p>• ${country}: ${stats.deaths.toLocaleString()} morts, ${stats.wounded.toLocaleString()} blessés</p>`;
+                popupContent += `<p>• ${country}: ${stats.deaths.toLocaleString()} morts${stats.wounded ? `, ${stats.wounded.toLocaleString()} blessés` : ''}${stats.missing ? `, ${stats.missing.toLocaleString()} disparus` : ''}</p>`;
             }
 
             popupContent += `</div>`;
             mainMarker.bindPopup(popupContent);
-            allMarkers.push(mainMarker);
+        }
 
-            // Recentrer la carte
-            if (battleKey === 'normandy') {
-                // Centrer sur la Normandie
-                map.setView([49.3, -0.5], 8);
+        // Focus sur une bataille
+        function focusOnBattle(battle) {
+            if (battle.beaches) {
+                // Centrer sur les plages du Débarquement
+                const bounds = battle.beaches.map(b => b.coords);
+                map.fitBounds(bounds);
             } else {
                 map.setView(battle.coordinates, 7);
             }
@@ -366,6 +434,25 @@
         // Effacer la liste des batailles
         function clearBattleList() {
             document.getElementById('battle-list').innerHTML = '';
+        }
+
+        // Afficher toutes les batailles
+        function showAllBattles() {
+            filteredBattles = ww2Battles;
+            displayBattles();
+        }
+
+        // Obtenir le nom du théâtre
+        function getTheatreName(theatreKey) {
+            const theatres = {
+                "europe_ouest": "Front de l'Ouest",
+                "europe_est": "Front de l'Est",
+                "pacifique": "Pacifique",
+                "afrique": "Afrique",
+                "mediterranee": "Méditerranée",
+                "autres": "Autres"
+            };
+            return theatres[theatreKey] || theatreKey;
         }
 
         // Initialisation
