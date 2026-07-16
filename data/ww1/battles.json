@@ -1,0 +1,94 @@
+{
+  "war": "Première Guerre Mondiale",
+  "start": 1914,
+  "end": 1918,
+  "totalDeaths": 20000000,
+  "description": "Guerre de position et de mouvement marquée par l'utilisation massive de l'artillerie, des chars et des gaz de combat.",
+  "battles": [
+    {
+      "id": 1,
+      "name": "Bataille de la Marne (1ère)",
+      "start": "1914-09-06",
+      "end": "1914-09-13",
+      "coordinates": [48.9533, 3.1586],
+      "location": "Marne, France",
+      "description": "Victoire franco-britannique qui sauve Paris et stoppe l'avancée allemande (Plan Schlieffen).",
+      "casualties": {
+        "France": { "deaths": 250000, "wounded": 600000, "missing": 50000 },
+        "Germany": { "deaths": 220000, "wounded": 500000, "missing": 40000 },
+        "UK": { "deaths": 12000, "wounded": 35000, "missing": 2000 }
+      },
+      "countries": ["France", "Royaume-Uni", "Allemagne"],
+      "keyEvents": ["Attaque allemande sur Paris", "Contre-offensive alliée", "Victoire française"],
+      "sources": ["Mémoire des Hommes", "Historial de la Grande Guerre"]
+    },
+    {
+      "id": 2,
+      "name": "Bataille de Verdun",
+      "start": "1916-02-21",
+      "end": "1916-12-19",
+      "coordinates": [49.2281, 5.4203],
+      "location": "Verdun, Meuse, France",
+      "description": "Bataille la plus longue et l'une des plus meurtrières de la guerre. Symbole de la résistance française.",
+      "casualties": {
+        "France": { "deaths": 161108, "wounded": 216000, "missing": 0 },
+        "Germany": { "deaths": 143000, "wounded": 180000, "missing": 0 }
+      },
+      "countries": ["France", "Allemagne"],
+      "keyEvents": ["Attaque allemande massive", "Résistance héroïque française", "Ossuaire de Douaumont"],
+      "sources": ["Mémoire des Hommes", "Mémorial de Verdun"]
+    },
+    {
+      "id": 3,
+      "name": "Bataille de la Somme",
+      "start": "1916-07-01",
+      "end": "1916-11-18",
+      "coordinates": [50.0083, 2.6403],
+      "location": "Somme, Picardie, France",
+      "description": "Offensive franco-britannique massive. Premier engagement des chars britanniques. Gain territorial limité mais usure de l'armée allemande.",
+      "casualties": {
+        "France": { "deaths": 204000, "wounded": 400000, "missing": 30000 },
+        "UK": { "deaths": 95000, "wounded": 300000, "missing": 25000 },
+        "Germany": { "deaths": 200000, "wounded": 500000, "missing": 40000 }
+      },
+      "countries": ["France", "Royaume-Uni", "Allemagne"],
+      "keyEvents": ["Premier jour : 60 000 morts britanniques", "Premiers chars Mark I", "Gain de 10 km"],
+      "sources": ["Mémoire des Hommes", "Imperial War Museum"]
+    },
+    {
+      "id": 4,
+      "name": "Bataille d'Artois (1ère)",
+      "start": "1915-05-09",
+      "end": "1915-06-18",
+      "coordinates": [50.3833, 2.7500],
+      "location": "Artois, France",
+      "description": "Offensive française pour soulager la pression sur les Russes. Peu de gains territoriaux.",
+      "casualties": {
+        "France": { "deaths": 100000, "wounded": 200000, "missing": 10000 },
+        "Germany": { "deaths": 75000, "wounded": 150000, "missing": 5000 }
+      },
+      "countries": ["France", "Allemagne"],
+      "keyEvents": ["Attaques massives d'infanterie", "Utilisation massive de l'artillerie"],
+      "sources": ["Mémoire des Hommes"]
+    },
+    {
+      "id": 5,
+      "name": "Bataille de Gallipoli",
+      "start": "1915-02-17",
+      "end": "1916-01-09",
+      "coordinates": [40.0500, 26.2500],
+      "location": "Gallipoli, Turquie",
+      "description": "Campagne alliée pour ouvrir un front dans les Dardanelles. Échec cuisant avec de lourdes pertes.",
+      "casualties": {
+        "UK": { "deaths": 46000, "wounded": 236000, "missing": 0 },
+        "Australia": { "deaths": 8709, "wounded": 19441, "missing": 0 },
+        "New Zealand": { "deaths": 2721, "wounded": 4852, "missing": 0 },
+        "France": { "deaths": 10000, "wounded": 25000, "missing": 0 },
+        "Ottoman Empire": { "deaths": 86000, "wounded": 200000, "missing": 0 }
+      },
+      "countries": ["Royaume-Uni", "Australie", "Nouvelle-Zélande", "France", "Empire ottoman"],
+      "keyEvents": ["Débarquement du 25 avril 1915", "ANZAC Cove", "Évacuation en janvier 1916"],
+      "sources": ["Australian War Memorial", "Mémoire des Hommes"]
+    }
+  ]
+}
